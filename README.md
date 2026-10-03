@@ -50,10 +50,11 @@ Frontend / Control Plane: React 18, Vite, Recharts, Lucide React
 Dev Tools: Nodemon, ESLint
 ## 🎥 Live Demo Section
 
-<video src="https://github.com/user-attachments/assets/8014f704-0ac8-4f13-9764-776494e1c38a" controls="controls" width="100%"></video>
+https://github.com/user-attachments/assets/8014f704-0ac8-4f13-9764-776494e1c38a.mp4
 
-<video src="https://github.com/user-attachments/assets/c0c02cca-deee-4f64-a383-77f016f1155c" controls="controls" width="100%"></video>
+https://github.com/user-attachments/assets/c0c02cca-deee-4f64-a383-77f016f1155c.mp4
 
+---
 ---
 
 ## 🚀 Getting Started
