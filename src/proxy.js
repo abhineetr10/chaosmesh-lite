@@ -2,57 +2,75 @@ const httpProxy = require('http-proxy');
 const config = require('./config');
 const metrics = require('./metrics');
 
-const proxy = httpProxy.createProxyServer({});
-
-proxy.on('error', (err, req, res) => {
-  console.error('[Proxy Error]:', err.message);
-  if (!res.headersSent) {
-    res.writeHead(502, { 'Content-Type': 'application/json' });
-  }
-  res.end(JSON.stringify({ error: 'Target Offline or Bad Gateway' }));
+const proxy = httpProxy.createProxyServer({
+  changeOrigin: true,
+  ws: true
 });
 
-const chaosMiddleware = (req, res) => {
+// Intercept proxy responses to properly record metrics
+proxy.on('proxyRes', (proxyRes, req, res) => {
+  metrics.activeConnections = Math.max(0, metrics.activeConnections - 1);
+  const latency = Date.now() - (req._startTime || Date.now());
+  const isError = proxyRes.statusCode >= 400;
+  metrics.recordRequest(latency, isError);
+});
+
+// Intercept proxy errors (e.g. mock server down or dropped)
+proxy.on('error', (err, req, res) => {
+  metrics.activeConnections = Math.max(0, metrics.activeConnections - 1);
+  const latency = Date.now() - (req._startTime || Date.now());
+  metrics.recordRequest(latency, true);
+
+  if (!res.headersSent) {
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Proxy Error', message: err.message }));
+  }
+});
+
+function chaosMiddleware(req, res) {
+  req._startTime = Date.now();
   metrics.activeConnections++;
-  const startTime = Date.now();
 
-  res.on('finish', () => {
-    metrics.activeConnections--;
-    const latency = Date.now() - startTime;
-    const isError = res.statusCode >= 400;
-    metrics.recordRequest(latency, isError);
-  });
-
+  // Chaos check: Disabled
   if (!config.enabled) {
     return proxy.web(req, res, { target: config.targetUrl });
   }
 
-  // Fault 1: Abrupt Connection Drop
-  if (config.connectionDrop.enabled && Math.random() < config.connectionDrop.rate) {
-    console.log(`⚡ [Chaos] Dropped TCP connection for ${req.method} ${req.url}`);
-    return req.socket.destroy();
+  // Chaos: Connection Drop
+  if (config.connectionDrop && config.connectionDrop.enabled) {
+    if (Math.random() < config.connectionDrop.rate) {
+      metrics.activeConnections = Math.max(0, metrics.activeConnections - 1);
+      metrics.recordRequest(0, true);
+      return req.destroy();
+    }
   }
 
-  // Fault 2: HTTP Status Fault Injection
-  if (config.faultInjection.enabled && Math.random() < config.faultInjection.failureRate) {
-    console.log(`🔥 [Chaos] Injected ${config.faultInjection.statusCode} error for ${req.url}`);
-    res.writeHead(config.faultInjection.statusCode, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ error: config.faultInjection.errorMessage }));
+  // Chaos: Fault / Error Injection
+  if (config.faultInjection && config.faultInjection.enabled) {
+    if (Math.random() < config.faultInjection.failureRate) {
+      metrics.activeConnections = Math.max(0, metrics.activeConnections - 1);
+      const latency = Date.now() - req._startTime;
+      metrics.recordRequest(latency, true);
+      return res.status(config.faultInjection.statusCode || 500).json({
+        error: config.faultInjection.errorMessage || 'Chaos Injected Error'
+      });
+    }
   }
 
-  // Fault 3: Latency & Jitter Injection
-  if (config.latency.enabled) {
-    const jitter = Math.floor(Math.random() * (config.latency.jitterMs * 2)) - config.latency.jitterMs;
-    const delay = Math.max(0, config.latency.delayMs + jitter);
+  // Chaos: Latency & Jitter
+  let delay = 0;
+  if (config.latency && config.latency.enabled) {
+    const jitter = (Math.random() * 2 - 1) * (config.latency.jitterMs || 0);
+    delay = Math.max(0, (config.latency.delayMs || 0) + jitter);
+  }
 
-    console.log(`⏳ [Chaos] Delayed ${req.url} by ${delay}ms`);
-    return setTimeout(() => {
+  if (delay > 0) {
+    setTimeout(() => {
       proxy.web(req, res, { target: config.targetUrl });
     }, delay);
+  } else {
+    proxy.web(req, res, { target: config.targetUrl });
   }
-
-  // Default passthrough
-  proxy.web(req, res, { target: config.targetUrl });
-};
+}
 
 module.exports = chaosMiddleware;

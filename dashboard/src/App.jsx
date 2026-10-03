@@ -102,7 +102,7 @@ export default function App() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
         <div style={{ background: '#f1f5f9', padding: '16px', borderRadius: '8px' }}>
           <span style={{ fontSize: '13px', color: '#64748b' }}>Total Requests</span>
-          <h2 style={{ margin: '8px 0 0', fontSize: '24px' }}>{metrics.totalRequests}</h2>
+          <h2 style={{ margin: '8px 0 0', fontSize: '24px', color: '#1e293b' }}>{metrics.totalRequests}</h2>
         </div>
         <div style={{ background: '#f1f5f9', padding: '16px', borderRadius: '8px' }}>
           <span style={{ fontSize: '13px', color: '#64748b' }}>Error Rate</span>
@@ -112,7 +112,7 @@ export default function App() {
         </div>
         <div style={{ background: '#f1f5f9', padding: '16px', borderRadius: '8px' }}>
           <span style={{ fontSize: '13px', color: '#64748b' }}>Avg Latency</span>
-          <h2 style={{ margin: '8px 0 0', fontSize: '24px' }}>{metrics.avgLatencyMs} ms</h2>
+          <h2 style={{ margin: '8px 0 0', fontSize: '24px', color: '#2563eb' }}>{metrics.avgLatencyMs} ms</h2>  
         </div>
         <div style={{ background: '#f1f5f9', padding: '16px', borderRadius: '8px' }}>
           <span style={{ fontSize: '13px', color: '#64748b' }}>p95 Latency</span>

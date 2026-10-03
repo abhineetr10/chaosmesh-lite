@@ -6,6 +6,7 @@ const metrics = {
   recentLatencies: [],
 
   recordRequest: function(latency, isError) {
+    console.log(`>>> RECORDED REQUEST: latency=${latency}, total=${this.totalRequests + 1}`);
     this.totalRequests++;
     this.totalLatencyMs += latency;
     if (isError) this.failedRequests++;
