@@ -30,6 +30,7 @@ ChaosMesh-Lite sits between clients and upstream microservices, allowing enginee
                |  Upstream Microservice    |
                |       (Port 3000)         |
                +---------------------------+
+```
 
 ✨ Features
 Dynamic Latency Injection: Simulates network congestion with user-defined delay buffers and jitter offsets.
