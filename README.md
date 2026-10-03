@@ -48,8 +48,13 @@ Backend / Core Engine: Node.js, Express, http-proxy, ws (WebSockets)
 Frontend / Control Plane: React 18, Vite, Recharts, Lucide React
 
 Dev Tools: Nodemon, ESLint
+## 🎦 Live Demo Section
+https://github.com/user-attachments/assets/8014f704-0ac8-4f13-9764-776494e1c38a
+
+https://github.com/user-attachments/assets/c0c02cca-deee-4f64-a383-77f016f1155c
 
 🚀 Getting Started
 Prerequisites
 Node.js (v18+ recommended)
 npm
+docs: add demo video clips
