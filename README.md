@@ -1,6 +1,9 @@
 # ⚡ ChaosMesh-Lite
 
 A lightweight, real-time chaos engineering and network resilience proxy built from scratch with Node.js and React.
+![ChaosMesh-Lite Dashboard](docs/assets/dashboard_preview.png)
+### Telemetry & Interception Pipeline
+![Terminal Metrics Verification](docs/assets/backend_and_coding_details.png)
 
 ChaosMesh-Lite sits between clients and upstream microservices, allowing engineers to dynamically inject configurable latency, artificial HTTP failure rates, and abrupt TCP socket terminations without altering upstream application code.
 
